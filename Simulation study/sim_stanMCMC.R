@@ -19,8 +19,7 @@ K_star = 10
 K_curr = 0
 
 # Model
-bsa_model = stan_model("stan/bsa_dirichlet.stan") 
-#bsa_model = stan_model("stan/bsa_model.stan") 
+bsa_model = stan_model("bsa_dirichlet.stan") 
 
 # Data
 bsa_data = list(
@@ -38,40 +37,42 @@ bsa_data = list(
   X=X,          # covariates
   B=B,          # basis splines matrix
   D=D,          # sites' distance matrix
-  eps=0.015      # shrinkage threshold
+  eps=0.05      # shrinkage threshold
 )
 
 # MCMC sampling
 #1: Few iterations during sources' shrinkage to find K*
 while (K_star != K_curr) {
-  bsa_data[[K]] = K_star
+  bsa_data$K = K_star
   bsa_fit = sampling(
     bsa_model,
     data = bsa_data,
-    seed = 2024,
-    chains = 1,   
-    warmup = 900,          
-    iter = 1000,
-    refresh = 100
+    seed = 1997,
+    chains = 1,
+    warmup = 500,
+    iter = 550,
+    refresh = 50
   )
   fit = bsa_fit
   K_curr = K_star
-  K_star = as.integer(median(rstan::extract(fit)$count))
+  K_star = as.integer(median(as.array(fit, pars = c("count"))))
+  cat(sprintf("K_curr: %g, K_star: %g\n", K_curr, K_star))
 }
 #2: Longer MCMC with the number of sources K* we just retrieved
-bsa_data[[K]] = K_star
+bsa_data$K = K_star
 bsa_fit = sampling(
   bsa_model,
   data = bsa_data,
-  seed = 2024,
-  chains = 2,   
-  warmup = 3000,          
-  iter = 5000,
-  refresh = 500
+  seed = 1997,
+  chains = 1,
+  warmup = 6000,
+  iter = 10000,
+  refresh = 1000
 )
 
 # Save MCMC
-saveRDS(bsa_fit, file = "bsa_fit_simulation.RDS")
+saveRDS(bsa_fit, file = "sim_fit_dirichlet.RDS")
+
 
 
 
