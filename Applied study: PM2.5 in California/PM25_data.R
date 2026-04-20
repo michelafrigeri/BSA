@@ -15,13 +15,13 @@ data = data[order(data$SiteName, data$t), ]
 names(data)
 
 
-# alcuni negativi?? per ora metto a zero ma CHIEDERE
+# Some negative values due to EPA pre-processing: 
+# we shift everything up of 0.5 micrograms/m^3 to guarantee non-negative concentrations
 min(data[,3:8], na.rm=T)
 matplot(data[,3:8], type='l')
-prova = data[,3:8] +0.5
-matplot(log(prova), type='l')
+matplot(log(data[,3:8] +0.5), type='l')
 
-# Trasformiamo i dati in scala log
+# Logarithmic transformation
 data[ ,3:8] = log(data[ ,3:8]+0.5)
 
 C = 6
@@ -44,12 +44,10 @@ t_index = matrix(rep(0,N*T), nrow=N, ncol=T)
 for (i in 1:N) {
   t_index[i, 1:T_i[i]] = match(t_obs[[i]], t_basis)
 }
-
-
 sum(rowSums(is.na(data)))
 
 
-# creating data in the right format
+# creating data in the needed format
 Y_obs = array(data=rep(NA, N*C*T), dim=c(N,C,T))
 for (i in 1:N) {
   temp_staz = data[data$SiteName==stations[i], 3:8]
@@ -75,8 +73,7 @@ for (i in 1:N) {
 
 
 
-# Covariates
-## Real covariates and locations
+# Covariates and locations
 staz = read_csv("FinalStations.csv")
 staz$LandSetting = as.factor(staz$LandSetting)
 staz = staz[order(staz$`Local Site Name`), ]
@@ -92,7 +89,7 @@ names(X)
 latlong = staz[ ,2:1]
 D = distm(latlong, latlong, fun = distHaversine)/1000 
 D = round(D,2)
-max(D)/3
+
 
 save.image(file="final_PM25_data.RData")
 
@@ -108,4 +105,5 @@ for (i in 1:N) {
   }
 }
 range(yobs, na.rm = T)
+
 

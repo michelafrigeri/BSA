@@ -35,9 +35,6 @@ matplot(t(L_mean), ylim=c(0,1))
 abline(h=c(0.03,0.05), lty=2)
 #mcmc_trace(as.array(fit, pars = c("L")))
 
-coeff = extract(fit, pars = c("coeff_g"), permuted=F)
-mean()
-
 
 
 # Regression coefficients: beta_k -----------------------------------------
@@ -59,7 +56,7 @@ ggplot(data=betas_ci[-c(10:12), ], aes(x=parameter, y=m, color=factor(rep(1:3,3)
   theme(text = element_text(size=15)) + ggtitle("") 
   
 
-# table of values to be included in the paper
+# table of values 
 beta_table = data.frame(
   suburb = rbind(sprintf('%s (%s)', toString(round(beta1[1,3],2)), toString(round(beta1[1,c(2,4)], 2))),
                  sprintf('%s (%s)', toString(round(beta2[1,3],2)), toString(round(beta2[1,c(2,4)], 2))),

@@ -7,10 +7,8 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(rstan)
 
-
 # Loading simulation data -------------------------------------------------
 load("final_PM25_data.RData")
-
 
 # Iterative BSA with Stan ----------------------------------------------------------
 Y = Y_obs
